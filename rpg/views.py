@@ -1,5 +1,4 @@
 import logging
-import random
 from typing import Any
 
 from braces.views import (  # NOQA
@@ -35,6 +34,7 @@ from rpg.models import VulnerabilityRecord
 from .forms import DiamondsForm
 from .levelsys import LevelInfoDict, get_level_info, get_student_rows
 from .models import Achievement, AchievementUnlock, Level, PalaceCarving
+import secrets
 
 logger = logging.getLogger(__name__)
 
@@ -332,7 +332,7 @@ class DiamondUpdate(
         achievement, is_new = Achievement.objects.get_or_create(creator=student.user)
         if is_new is True:
             achievement.code = "".join(
-                random.choice("0123456789abcdef") for _ in range(24)
+                secrets.SystemRandom().choice("0123456789abcdef") for _ in range(24)
             )
             achievement.diamonds = RUBY_PALACE_DIAMOND_VALUE
             achievement.name = student.name
