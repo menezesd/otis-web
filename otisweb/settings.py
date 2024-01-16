@@ -369,3 +369,4 @@ LOGGING = {
 }
 if TESTING:
     logging.disable(evans_django_tools.ACTION_LOG_LEVEL)
+SESSION_COOKIE_SECURE = True
