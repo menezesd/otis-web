@@ -371,8 +371,7 @@ def discord_handler(action: str, data: JSONData) -> JsonResponse:
 
     social = queryset.get()  # get the social account for this; should never 404
     user = social.user
-    student = Student.objects.filter(user=user, semester__active=True).first()
-    if student is None:
+    if (student := Student.objects.filter(user=user, semester__active=True).first()) is None:
         student = Student.objects.filter(user=user).order_by("-pk").first()
         active = False
     else:

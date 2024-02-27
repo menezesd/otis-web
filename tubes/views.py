@@ -33,8 +33,7 @@ def tube_join(request: HttpRequest, pk: int) -> HttpResponse:
     try:
         jr = JoinRecord.objects.get(tube=tube, user=request.user)
     except JoinRecord.DoesNotExist:
-        jr = JoinRecord.objects.filter(tube=tube, user__isnull=True).first()
-        if jr is None:
+        if (jr := JoinRecord.objects.filter(tube=tube, user__isnull=True).first()) is None:
             # we ran out of valid codes to give fml
             messages.error(
                 request, "Ran out of one-time invite codes, please contact staff."

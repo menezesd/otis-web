@@ -48,8 +48,7 @@ else:
     ]
     SITE_URL = "http://127.0.0.1"
 SITE_ID = 1
-TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
-if TESTING:
+if TESTING := len(sys.argv) > 1 and sys.argv[1] == "test":
     assert DEBUG, "Don't run testing on production you big doofus"
 
 # Application definition

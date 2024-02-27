@@ -65,8 +65,7 @@ class HintList(VerifiedRequiredMixin, ListView[Hint]):
         try:
             self.problem = Problem.objects.get(puid=puid)
         except Problem.DoesNotExist:
-            statement_exists_on_disk = get_disk_statement_from_puid(puid) is not None
-            if statement_exists_on_disk:
+            if statement_exists_on_disk := get_disk_statement_from_puid(puid) is not None:
                 self.problem = Problem(puid=puid)
                 self.problem.save()
                 messages.info(request, f"Created previously nonexistent problem {puid}")

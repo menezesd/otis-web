@@ -301,11 +301,10 @@ def handle_inquiry(request: AuthHttpRequest, inquiry: UnitInquiry, student: Stud
     )
 
     # auto reject criteria - the current petition counts toward the unlock count
-    auto_reject_criteria = (
-        inquiry.action_type == "INQ_ACT_UNLOCK" and unlocked_count > 9
-    )
 
-    if auto_reject_criteria:
+    if auto_reject_criteria := (
+        inquiry.action_type == "INQ_ACT_UNLOCK" and unlocked_count > 9
+    ):
         inquiry.status = "INQ_REJ"
         inquiry.was_auto_processed = True
         inquiry.save()
@@ -317,9 +316,8 @@ def handle_inquiry(request: AuthHttpRequest, inquiry: UnitInquiry, student: Stud
 
     # auto hold criteria
     num_psets = PSet.objects.filter(student=student).count()
-    auto_hold_criteria = num_past_unlock_inquiries > (10 + 1.5 * num_psets**1.2)
 
-    if auto_hold_criteria:
+    if auto_hold_criteria := num_past_unlock_inquiries > (10 + 1.5 * num_psets**1.2):
         inquiry.status = "INQ_HOLD"
         inquiry.save()
         logger.log(
@@ -582,8 +580,7 @@ def giga_chart(request: HttpRequest, format_as: str) -> HttpResponse:
 
     for invoice in queryset:
         student = invoice.student
-        user = student.user
-        if user is None:
+        if (user := student.user) is None:
             continue
         reg = student.reg
         delta = timezone.now() - user.profile.last_seen
@@ -625,8 +622,7 @@ def giga_chart(request: HttpRequest, format_as: str) -> HttpResponse:
     for row in rows:
         pt.add_row(row)
 
-    format_as = format_as.lower()
-    if format_as == "csv":
+    if (format_as := format_as.lower()) == "csv":
         filename = f"otis-{where}-{timestamp}.csv"
         return HttpResponse(
             content=pt.get_csv_string(),

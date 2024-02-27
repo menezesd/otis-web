@@ -157,7 +157,6 @@ class Guess(models.Model):
         )
 
     def set_score(self):
-        score = self.get_score()
-        if score is not None:
+        if (score := self.get_score()) is not None:
             self.score = score
             self.save()
