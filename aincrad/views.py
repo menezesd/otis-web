@@ -351,7 +351,7 @@ def venueq_handler(action: str, data: JSONData) -> JsonResponse:
                     student__semester__active=True, student__user=job.assignee.user
                 )
             except Invoice.DoesNotExist:
-                logging.warn(f"Could not get invoice for {job.assignee.user}")
+                logging.warning(f"Could not get invoice for {job.assignee.user}")
                 return JsonResponse({"result": "failed", "changed": False}, status=400)
             else:
                 invoice.credits += job.usd_bounty
