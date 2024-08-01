@@ -1,2 +1,3 @@
 SLUG = "haxx"
 APP_LABEL = "wiki"
+SESSION_COOKIE_SECURE = True
