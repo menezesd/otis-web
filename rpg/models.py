@@ -1,5 +1,4 @@
 import os
-import random
 from hashlib import sha256
 
 from django.conf import settings
@@ -10,13 +9,14 @@ from django.db import models
 from core.models import UnitGroup
 from dashboard.models import validate_at_most_1mb  # should be in core maybe?
 from roster.models import Student
+import secrets
 
 
 def achievement_image_file_name(instance: "Achievement", filename: str) -> str:
     pk = instance.pk
     ext = os.path.splitext(filename)[-1]
     if pk is None:
-        n = random.randrange(0, 2**64)
+        n = secrets.SystemRandom().randrange(0, 2**64)
         basename = f"r{n:016x}"
     else:
         kludge = (settings.SECRET_KEY or "") + "_otis_diamond_" + str(pk)
