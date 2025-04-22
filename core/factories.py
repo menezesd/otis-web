@@ -1,4 +1,3 @@
-import random
 from typing import Any, Iterable
 
 from django.conf import settings
@@ -15,6 +14,7 @@ from factory.helpers import post_generation
 from core.models import Semester, Unit, UnitGroup, UserProfile
 from core.utils import storage_hash
 from evans_django_tools.testsuite import UniqueFaker
+import secrets
 
 User = get_user_model()
 
@@ -58,7 +58,7 @@ class UnitFactory(DjangoModelFactory):
         model = Unit
 
     code = LazyAttribute(
-        lambda o: random.choice("BDZ") + o.group.subject[0] + random.choice("WXY")
+        lambda o: secrets.choice("BDZ") + o.group.subject[0] + secrets.choice("WXY")
     )
     group = SubFactory(UnitGroupFactory)
     position = Sequence(lambda n: n + 1)

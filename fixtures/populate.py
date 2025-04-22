@@ -1,13 +1,14 @@
 # TODO: this entire thing is a giant hack that could be really cleaned up
 
 # hack to unindent following code
+import secrets
+
 if __name__ != "__main__":
     raise TypeError("Attempted to import command-line only script")
 
 import argparse
 import math
 import os
-import random
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -46,7 +47,7 @@ from rpg.factories import (
 from rpg.models import Achievement
 from suggestions.factories import ProblemSuggestionFactory
 
-random.seed("OTIS-WEB")
+secrets.SystemRandom().seed("OTIS-WEB")
 
 # https://stackoverflow.com/questions/58780717/how-to-use-django-model-in-an-external-python-script-within-the-project
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "otisweb.settings")
@@ -123,7 +124,7 @@ def fast_bulk_create(cls: type[Factory], size: int, **kwargs: Any) -> Any:  # ty
 
 # silly thing with slight bias for small numbers
 def randint_low(a: int, b: int) -> int:
-    return a + b - round(math.sqrt(random.randint(a**2, b**2)))
+    return a + b - round(math.sqrt(secrets.SystemRandom().randint(a**2, b**2)))
 
 
 ## Creation
@@ -144,7 +145,7 @@ def create_sem_independent(users: list[User]):
     for problem in problems:
         hint_num = randint_low(0, 10)
         hint_seq_data.extend(
-            (problem, percent) for percent in random.sample(range(0, 101), hint_num)
+            (problem, percent) for percent in secrets.SystemRandom().sample(range(0, 101), hint_num)
         )
     fast_bulk_create(
         HintFactory,
@@ -212,16 +213,15 @@ def create_sem_independent(users: list[User]):
     for user in users:
         # achievement unlocks
         if args.achievement_num > 0:
-            stu_achievements = random.sample(
-                achievements, randint_low(0, max_stu_achievements)
+            stu_achievements = secrets.SystemRandom().sample(achievements, randint_low(0, max_stu_achievements)
             )
 
             for achievement in stu_achievements:
                 achievement_seq_data.append((user, achievement))
 
         # suggestions
-        if random.random() < 0.24:
-            suggest_seq_data.append((user, random.choice(units)))
+        if secrets.SystemRandom().random() < 0.24:
+            suggest_seq_data.append((user, secrets.choice(units)))
 
     print(f"Creating {len(achievement_seq_data)} achievement unlocks")
     fast_bulk_create(
@@ -316,9 +316,9 @@ def create_sem_dependent(semester: Semester, users: list[User]):
 
     for student in students:
         # add a few units
-        stu_curriculum_num = random.randint(1, max_stu_units)
-        stu_unlocked_num = random.randint(1, stu_curriculum_num)
-        stu_units = random.sample(units, stu_curriculum_num)
+        stu_curriculum_num = secrets.SystemRandom().randint(1, max_stu_units)
+        stu_unlocked_num = secrets.SystemRandom().randint(1, stu_curriculum_num)
+        stu_units = secrets.SystemRandom().sample(units, stu_curriculum_num)
 
         curriculum_bulk.extend(
             [
@@ -335,16 +335,16 @@ def create_sem_dependent(semester: Semester, users: list[User]):
 
         if stu_curriculum_num > min_stu_units + 1:
             for i in range(min_stu_units, stu_curriculum_num - 1):
-                if random.random() > 0.2:
+                if secrets.SystemRandom().random() > 0.2:
                     continue
-                status = "P" if random.random() > 0.9 else "A"
+                status = "P" if secrets.SystemRandom().random() > 0.9 else "A"
                 psets.append(
                     PSetFactory.build(
                         student=student,
                         unit=stu_units[i],
                         next_unit_to_unlock=stu_units[i + 1],
-                        hours=random.randint(1, 54),
-                        clubs=random.randint(30, 200),
+                        hours=secrets.SystemRandom().randint(1, 54),
+                        clubs=secrets.SystemRandom().randint(30, 200),
                         status=status,
                     )
                 )
@@ -359,10 +359,10 @@ def create_sem_dependent(semester: Semester, users: list[User]):
     student_iter_data_for_quizzes: list[Student] = []
     quiz_iter_data: list[PracticeExam] = []
     for student in students:
-        if random.random() < 0.3:
+        if secrets.SystemRandom().random() < 0.3:
             continue
         for quiz in quizzes:
-            if random.random() < 0.4:
+            if secrets.SystemRandom().random() < 0.4:
                 student_iter_data_for_quizzes.append(student)
                 quiz_iter_data.append(quiz)
     print(f"Creating {len(student_iter_data_for_quizzes)} quiz submissions")
@@ -377,10 +377,10 @@ def create_sem_dependent(semester: Semester, users: list[User]):
     # Quest completes
     student_iter_data_for_quests: list[Student] = []
     for student in students:
-        if random.random() < 0.65:
+        if secrets.SystemRandom().random() < 0.65:
             continue
         student_iter_data_for_quests.extend(
-            student for _ in range(random.randrange(1, 3))
+            student for _ in range(secrets.SystemRandom().randrange(1, 3))
         )
     print(f"Creating {len(student_iter_data_for_quests)} quest completes")
     fast_bulk_create(
@@ -393,10 +393,10 @@ def create_sem_dependent(semester: Semester, users: list[User]):
     user_iter_data_for_markets: list[User] = []
     market_iter_data: list[Market] = []
     for student in students:
-        if random.random() < 0.2:
+        if secrets.SystemRandom().random() < 0.2:
             continue
         for market in markets:
-            if random.random() < 0.8:
+            if secrets.SystemRandom().random() < 0.8:
                 user_iter_data_for_markets.append(student.user)
                 market_iter_data.append(market)
     print(f"Creating {len(user_iter_data_for_markets)} guesses for markets")
@@ -409,8 +409,8 @@ def create_sem_dependent(semester: Semester, users: list[User]):
 
     students_who_got_assistants: list[Student] = []
     for student in students:
-        if args.assistant_num > 0 and random.random() < 0.1:
-            student.assistant = random.choice(assistants)
+        if args.assistant_num > 0 and secrets.SystemRandom().random() < 0.1:
+            student.assistant = secrets.choice(assistants)
             students_who_got_assistants.append(student)
     print(f"Assigning instructors to {len(students_who_got_assistants)} students")
     Student.objects.bulk_update(
@@ -457,8 +457,8 @@ def init():
         exam_family="Waltz",
     )
 
-    create_sem_dependent(old_semester, random.sample(users, int(0.6 * len(users))))
-    create_sem_dependent(current_semester, random.sample(users, int(0.7 * len(users))))
+    create_sem_dependent(old_semester, secrets.SystemRandom().sample(users, int(0.6 * len(users))))
+    create_sem_dependent(current_semester, secrets.SystemRandom().sample(users, int(0.7 * len(users))))
 
 
 init()
