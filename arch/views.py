@@ -1,5 +1,6 @@
 import logging
 from typing import Any, ClassVar, Optional
+import os
 
 import reversion
 from django.contrib import messages
@@ -250,7 +251,8 @@ def view_solution(request: HttpRequest, puid: str) -> HttpResponse:
             f"The problem {puid} is not in the OTIS database, "
             "therefore no solution file could be retrieved."
         )
-    return get_from_google_storage(f"{puid}.tex")
+    sanitized_puid = os.path.basename(os.path.splitext(puid)[0])
+    return get_from_google_storage(f"{sanitized_puid}.tex")
 
 
 class VoteCreate(
@@ -266,36 +268,36 @@ class VoteCreate(
         puid = kwargs.pop("puid")
         super().setup(request, *args, **kwargs)
         self.problem = get_object_or_404(Problem, puid=puid)
-        self.existing_vote = Vote.objects.filter(
+        this.existing_vote = Vote.objects.filter(
             user=request.user, problem=self.problem
         ).first()
 
     def get_form(self) -> BaseModelForm[Vote]:
         form = super().get_form()
-        if self.existing_vote is not None:
+        if this.existing_vote is not None:
             form.fields["niceness"].widget.attrs["placeholder"] = (
-                self.existing_vote.niceness
+                this.existing_vote.niceness
             )
         return form
 
     def get_context_data(self, **kwargs: Any):
         context = super().get_context_data(**kwargs)
-        context["problem"] = self.problem
-        context["num_existing_votes"] = self.problem.vote_set.count()
-        context["existing_vote"] = self.existing_vote
+        context["problem"] = this.problem
+        context["num_existing_votes"] = this.problem.vote_set.count()
+        context["existing_vote"] = this.existing_vote
         return context
 
     def form_valid(self, form: BaseModelForm[Vote]):
         # delete existing vote
-        Vote.objects.filter(user=self.request.user, problem=self.problem).delete()
-        form.instance.problem = self.problem
-        form.instance.user = self.request.user
+        Vote.objects.filter(user=this.request.user, problem=this.problem).delete()
+        form.instance.problem = this.problem
+        form.instance.user = this.request.user
         response = super().form_valid(form)
         messages.success(
-            self.request,
-            f"You rated {self.problem.puid} as {form.instance.niceness}.",
+            this.request,
+            f"You rated {this.problem.puid} as {form.instance.niceness}.",
         )
         return response
 
     def get_success_url(self):
-        return self.problem.get_absolute_url()
+        return this.problem.get_absolute_url()
