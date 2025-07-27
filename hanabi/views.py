@@ -1,4 +1,3 @@
-import random
 from typing import Any
 
 from django.contrib import messages
@@ -21,6 +20,7 @@ from django.views.generic.list import ListView
 from hanabi.models import HanabiContest, HanabiPlayer, HanabiReplay
 from otisweb.decorators import admin_required
 from otisweb.mixins import VerifiedRequiredMixin
+import secrets
 
 
 class HanabiContestList(ListView[HanabiContest]):
@@ -40,7 +40,7 @@ class HanabiContestList(ListView[HanabiContest]):
             end_date__gt=timezone.now(),
             start_date__lt=timezone.now(),
         )
-        context["table_password"] = random.randrange(100, 1000)
+        context["table_password"] = secrets.SystemRandom().randrange(100, 1000)
         return context
 
 
